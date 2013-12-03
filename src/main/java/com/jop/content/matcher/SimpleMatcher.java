@@ -3,13 +3,14 @@ package com.jop.content.matcher;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import org.springframework.stereotype.Component;
 
 /**
  * {@inheritDoc} Case of keywords is ignored while seeking.
  * 
  */
+@Component
 public class SimpleMatcher implements ContentMatcher {
 	// TODO MJ envolve log4j
 	// TODO MJ deal with multi word phrases
@@ -26,8 +27,7 @@ public class SimpleMatcher implements ContentMatcher {
 			throw new NullPointerException("Can not add null keyword");
 		}
 		if (keyword.isEmpty()) {
-			throw new IllegalArgumentException(
-					"Keyword cannot be an empty string");
+			throw new AssertionError("Keyword cannot be an empty string");
 		}
 
 		// save it in lower case to make sure there will not be duplicates
@@ -43,10 +43,29 @@ public class SimpleMatcher implements ContentMatcher {
 	 */
 	@Override
 	public boolean match(final String content) {
-		final String pattern = preparePattern();
-		final Pattern p = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
-		final Matcher m = p.matcher(content);
-		return m.find();
+		if (content == null) {
+			throw new NullPointerException(
+					"Can not search against null content.");
+		}
+		if (content.isEmpty()) {
+			throw new AssertionError("Can not match against empty content.");
+		}
+		if (keywords.isEmpty()) {
+			throw new IllegalStateException(
+					"No keyword has been set. There must be at least one keyword set.");
+		}
+
+		for (final String keyword : keywords) {
+			if (content.contains(keyword)) {
+				return true;
+			}
+		}
+
+		return false;
+		// final String pattern = preparePattern();
+		// final Pattern p = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
+		// final Matcher m = p.matcher(content);
+		// return m.find();
 	}
 
 	private String preparePattern() {

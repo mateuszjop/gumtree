@@ -6,6 +6,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.jop.content.matcher.ContentMatcher;
 import com.jop.content.matcher.SimpleMatcher;
@@ -26,7 +28,12 @@ public class Example {
 
 		System.out.println("count: " + elements.size());
 
-		final ContentMatcher matcher = new SimpleMatcher();
+		final ApplicationContext context = new ClassPathXmlApplicationContext(
+				new String[] { "applicationContext.xml" });
+
+		final ContentMatcher matcher = (SimpleMatcher) context
+				.getBean("simpleMatcher");
+
 		matcher.keyword(pattern1).keyword(pattern2).keyword("Krakowska");
 
 		int i = 1;
